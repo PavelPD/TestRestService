@@ -10,16 +10,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.students.testrestservice.model.Request;
 import ru.students.testrestservice.model.Response;
+import ru.students.testrestservice.service.ModifyRequestService;
 import ru.students.testrestservice.service.MyModifyService;
 
 @Slf4j
 @RestController
 public class MyController {
     private final MyModifyService myModifyService;
+    private final ModifyRequestService modifyRequestService;
 
     @Autowired
-    public MyController(@Qualifier("MyModifyUid") MyModifyService myModifyService) {
+    public MyController(@Qualifier("MyModifySystemTime") MyModifyService myModifyService,
+                        ModifyRequestService modifyRequestService) {
         this.myModifyService = myModifyService;
+        this.modifyRequestService = modifyRequestService;
     }
 
     @PostMapping(value = "/feedback")
@@ -36,7 +40,10 @@ public class MyController {
                 .errorMessage("")
                 .build();
 
+        modifyRequestService.modifyRq(request);
+
         Response responseAfterModify = myModifyService.modify(response);
+
         log.info("Исходящий response : " + response);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
